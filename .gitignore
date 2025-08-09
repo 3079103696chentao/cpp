@@ -1,0 +1,20 @@
+# Visual Studio generated files
+*.suo
+*.user
+*.userosscache
+*.sln.docstates
+*.dll
+*.pdb
+*.exe
+*.obj
+*.ilk
+*.tlog
+
+# Folders
+.vs/
+bin/
+obj/
+Debug/
+Release/
+x64/
+Win32/
