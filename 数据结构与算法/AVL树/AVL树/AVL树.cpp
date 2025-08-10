@@ -13,6 +13,10 @@ public:
 	void insert(const T &val) {
 		root = insert(root,val);
 	}
+   //删除操作
+	void remove(const T val) {
+		root = remove(root, val);
+	}
 private:
 	//定义AVL树节点类型
 	struct Node {
@@ -109,6 +113,77 @@ private:
 		node->height = max(height(node->left), height(node->right)) + 1;
 		return node;
 	}
+	//删除操作实现
+	Node* remove(Node* node,const T val) {
+		if (node == nullptr) {
+			return nullptr;
+		}
+		if (node->data > val) {
+			node->left = remove(node->left, val);
+			//左子树删除节点可能造成右子树太高
+			if (height(node->right) - height(node->left) > 1) {
+				if (height(node->right->right) >= height(node->right->left)) {
+					//左旋转操作,右孩子的右子树太高
+					node = leftRotate(node);
+				}
+				else {
+					//右孩子的左子树太高，左平衡操作
+					node = rightbalance(node);
+				}
+			}
+		}
+	
+		else if (node->data < val) {
+			node->right = remove(node->right, val);
+			//右子树删除节点，可能造成左子树太高
+			if (height(node->left) - height(node->right)>1) {
+				//左孩子的左子树太高
+				if (height(node->left->left) >= height(node->left->right)) {
+					node = rightRotate(node);
+				}
+				else {
+					//左孩子的右子树太高 左平衡操作
+					node = leftbalance(node);
+				}
+			}
+		}
+		else {
+			//node->data == val
+			//先处理有两个孩子的情况
+			if (node->left != nullptr && node->right != nullptr) {
+				//为了避免删除前驱或者后继节点造成节点失衡，谁高删除谁
+				if (height(node->left) >= height(node->right)) {
+					//删除前驱
+					Node* pre = node->left;
+					while (pre->right != nullptr) {
+						pre = pre->right;
+					}
+					node->data = pre->data;//用前驱节点的值代替待删除节点的值
+					node->left = remove(node->left, pre->data);//然后再在node的左子树找pre->data,删除
+
+				}
+				else {
+					//删后继
+					Node* post = node->right;
+					while (post->left != nullptr) {
+						post = post->left;
+					}//找到后继节点
+					node->data = post->data;
+					node->right = remove(node->right, post->data);//删除后继节点
+				}
+			}
+			else {
+				//待删除节点最多有一个孩子
+				Node* child = node->left != nullptr ? node->left : node->right;
+				delete node;
+				return child;
+
+			}
+				
+		}
+			node->height = max(height(node->left), height(node->right)) + 1;
+			return node;
+	}
 
 	Node* root;//指向根节点
 };
@@ -119,6 +194,12 @@ int main() {
 	for (int i = 1; i <= 10; i++) {
 		avl.insert(i);
 	}
+	avl.remove(9);
+	avl.remove(10);
+	avl.remove(6);
+	avl.remove(1);
+	avl.remove(2);
+	avl.remove(3);
 
 	return 0;
 }
